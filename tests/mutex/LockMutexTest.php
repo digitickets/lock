@@ -21,7 +21,7 @@ class LockMutexTest extends TestCase
      */
     private $mutex;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ class LockMutexTest extends TestCase
             ->method('lock')
             ->willThrowException(new LockAcquireException());
 
-        $this->mutex->synchronized(function (): void {
+        $this->mutex->synchronized(function () {
             $this->fail('Should not execute code.');
         });
     }
@@ -52,7 +52,7 @@ class LockMutexTest extends TestCase
         $this->mutex->expects($this->once())
             ->method('unlock');
 
-        $this->mutex->synchronized(function (): void {
+        $this->mutex->synchronized(function () {
         });
     }
 

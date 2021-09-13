@@ -22,14 +22,14 @@ class Loop
      *
      * @var double
      */
-    private const MINIMUM_WAIT_US = 1e4; // 0.01 seconds
+    const MINIMUM_WAIT_US = 1e4; // 0.01 seconds
 
     /**
      * Maximum time that we want to wait, between lock checks. In micro seconds.
      *
      * @var double
      */
-    private const MAXIMUM_WAIT_US = 5e5; // 0.50 seconds
+    const MAXIMUM_WAIT_US = 5e5; // 0.50 seconds
 
     /**
      * @var int The timeout in seconds.
@@ -64,7 +64,7 @@ class Loop
      *
      * @return void
      */
-    public function end(): void
+    public function end()
     {
         $this->looping = false;
     }

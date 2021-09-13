@@ -34,7 +34,7 @@ class PHPRedisMutexTest extends TestCase
      */
     private $mutex;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -123,7 +123,7 @@ class PHPRedisMutexTest extends TestCase
 
         $this->closeMajorityConnections();
 
-        $this->mutex->synchronized(function (): void {
+        $this->mutex->synchronized(function () {
             $this->fail('Code execution is not expected');
         });
     }
@@ -135,7 +135,7 @@ class PHPRedisMutexTest extends TestCase
     {
         $this->expectException(LockReleaseException::class);
 
-        $this->mutex->synchronized(function (): void {
+        $this->mutex->synchronized(function () {
             $this->closeMajorityConnections();
         });
     }

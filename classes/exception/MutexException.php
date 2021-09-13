@@ -21,5 +21,5 @@ class MutexException extends RuntimeException implements PhpLockException
     /**
      * @var int Not enough redis servers.
      */
-    public const REDIS_NOT_ENOUGH_SERVERS = 1;
+    const REDIS_NOT_ENOUGH_SERVERS = 1;
 }

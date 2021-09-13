@@ -25,7 +25,7 @@ class RedisMutexTest extends TestCase
 {
     use PHPMock;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -88,7 +88,7 @@ class RedisMutexTest extends TestCase
                 }
             );
 
-        $mutex->synchronized(function (): void {
+        $mutex->synchronized(function () {
             $this->fail('Code should not be executed');
         });
     }
@@ -153,7 +153,7 @@ class RedisMutexTest extends TestCase
                 }
             );
 
-        $mutex->synchronized(function (): void {
+        $mutex->synchronized(function () {
             $this->fail('Code should not be executed');
         });
     }
@@ -182,7 +182,7 @@ class RedisMutexTest extends TestCase
                 return true;
             });
 
-        $mutex->synchronized(function (): void {
+        $mutex->synchronized(function () {
             $this->fail('Code should not be executed');
         });
     }
@@ -227,7 +227,7 @@ class RedisMutexTest extends TestCase
                 }
             );
 
-        $mutex->synchronized(function (): void {
+        $mutex->synchronized(function () {
         });
     }
 
@@ -263,7 +263,7 @@ class RedisMutexTest extends TestCase
 
         $this->expectException(LockReleaseException::class);
 
-        $mutex->synchronized(function (): void {
+        $mutex->synchronized(function () {
         });
     }
 
@@ -275,7 +275,7 @@ class RedisMutexTest extends TestCase
      *
      * @dataProvider provideMinority
      */
-    public function testReleaseTooFewKeys(int $count, int $available): void
+    public function testReleaseTooFewKeys(int $count, int $available)
     {
         $mutex = $this->buildRedisMutex($count);
         $mutex->expects($this->exactly($count))
@@ -295,7 +295,7 @@ class RedisMutexTest extends TestCase
 
         $this->expectException(LockReleaseException::class);
 
-        $mutex->synchronized(function (): void {
+        $mutex->synchronized(function () {
         });
     }
 

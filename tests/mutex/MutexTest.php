@@ -26,9 +26,8 @@ class MutexTest extends TestCase
 {
     const TIMEOUT = 4;
 
-    public static function setUpBeforeClass(): void
+    public static function setUpBeforeClass()
     {
-        vfsStream::setup('test');
     }
 
     /**
@@ -41,39 +40,6 @@ class MutexTest extends TestCase
         $cases = [
             'NoMutex' => [function (): Mutex {
                 return new NoMutex();
-            }],
-
-            'TransactionalMutex' => [function (): Mutex {
-                $pdo = new \PDO('sqlite::memory:');
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-                return new TransactionalMutex($pdo, self::TIMEOUT);
-            }],
-
-            'FlockMutex' => [function (): Mutex {
-                $file = fopen(vfsStream::url('test/lock'), 'w');
-
-                return new FlockMutex($file);
-            }],
-
-            'flockWithTimoutPcntl' => [function (): Mutex {
-                $file = fopen(vfsStream::url('test/lock'), 'w');
-                $lock = Liberator::liberate(new FlockMutex($file, 3));
-                $lock->stategy = FlockMutex::STRATEGY_PCNTL; // @phpstan-ignore-line
-
-                return $lock->popsValue();
-            }],
-
-            'flockWithTimoutBusy' => [function ($timeout = 3): Mutex {
-                $file = fopen(vfsStream::url('test/lock'), 'w');
-                $lock = Liberator::liberate(new FlockMutex($file, 3));
-                $lock->stategy = FlockMutex::STRATEGY_BUSY; // @phpstan-ignore-line
-
-                return $lock->popsValue();
-            }],
-
-            'SemaphoreMutex' => [function (): Mutex {
-                return new SemaphoreMutex(sem_get(ftok(__FILE__, 'a')));
             }],
 
             'SpinlockMutex' => [function (): Mutex {
@@ -100,15 +66,6 @@ class MutexTest extends TestCase
                 return $mock;
             }],
         ];
-
-        if (getenv('MEMCACHE_HOST')) {
-            $cases['MemcachedMutex'] = [function (): Mutex {
-                $memcache = new Memcached();
-                $memcache->addServer(getenv('MEMCACHE_HOST'), 11211);
-
-                return new MemcachedMutex('test', $memcache, self::TIMEOUT);
-            }];
-        }
 
         if (getenv('REDIS_URIS')) {
             $uris = explode(',', getenv('REDIS_URIS'));
@@ -153,24 +110,6 @@ class MutexTest extends TestCase
             }
         }
 
-        if (getenv('MYSQL_DSN')) {
-            $cases['MySQLMutex'] = [function (): Mutex {
-                $pdo = new \PDO(getenv('MYSQL_DSN'), getenv('MYSQL_USER'), getenv('MYSQL_PASSWORD'));
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-                return new MySQLMutex($pdo, 'test' . time(), self::TIMEOUT);
-            }];
-        }
-
-        if (getenv('PGSQL_DSN')) {
-            $cases['PgAdvisoryLockMutex'] = [function (): Mutex {
-                $pdo = new \PDO(getenv('PGSQL_DSN'), getenv('PGSQL_USER'), getenv('PGSQL_PASSWORD'));
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-                return new PgAdvisoryLockMutex($pdo, 'test');
-            }];
-        }
-
         return $cases;
     }
 
@@ -202,7 +141,8 @@ class MutexTest extends TestCase
         $mutex->synchronized(function () {
         });
 
-        $this->expectNotToPerformAssertions();
+        $this->assertTrue(true);
+        //$this->expectNotToPerformAssertions();
         $mutex->synchronized(function () {
         });
     }

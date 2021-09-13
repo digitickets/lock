@@ -65,7 +65,7 @@ class LockReleaseException extends MutexException
      * @return \Throwable|null The exception thrown by the code block or null
      * when there has been no exception.
      */
-    public function getCodeException(): ?Throwable
+    public function getCodeException()
     {
         return $this->codeException;
     }

@@ -19,7 +19,7 @@ class LoopTest extends TestCase
 {
     use PHPMock;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -46,10 +46,11 @@ class LoopTest extends TestCase
      */
     public function testExecutionWithinTimeout()
     {
-        $this->expectNotToPerformAssertions();
+        $this->assertTrue(true);
+        //$this->expectNotToPerformAssertions();
 
         $loop = new Loop(1);
-        $loop->execute(function () use ($loop): void {
+        $loop->execute(function () use ($loop) {
             usleep(999999);
             $loop->end();
         });
@@ -60,10 +61,11 @@ class LoopTest extends TestCase
      */
     public function testExceedTimeoutIsAcceptableIfEndWasCalled()
     {
-        $this->expectNotToPerformAssertions();
+        $this->assertTrue(true);
+        //$this->expectNotToPerformAssertions();
 
         $loop = new Loop(1);
-        $loop->execute(function () use ($loop): void {
+        $loop->execute(function () use ($loop) {
             sleep(1);
             $loop->end();
         });
@@ -78,7 +80,7 @@ class LoopTest extends TestCase
         $this->expectExceptionMessage('Timeout of 1 seconds exceeded.');
 
         $loop = new Loop(1);
-        $loop->execute(function (): void {
+        $loop->execute(function () {
             sleep(1);
         });
     }
@@ -117,7 +119,7 @@ class LoopTest extends TestCase
     {
         $i = 0;
         $loop = new Loop();
-        $loop->execute(function () use ($loop, &$i): void {
+        $loop->execute(function () use ($loop, &$i) {
             $i++;
             if ($i > 1) {
                 $loop->end();
