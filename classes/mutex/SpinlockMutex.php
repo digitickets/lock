@@ -22,7 +22,7 @@ abstract class SpinlockMutex extends LockMutex
     /**
      * The prefix for the lock key.
      */
-    private const PREFIX = 'lock_';
+    const PREFIX = 'lock_';
 
     /**
      * @var int The timeout in seconds a lock may live.
@@ -58,9 +58,9 @@ abstract class SpinlockMutex extends LockMutex
         $this->key = self::PREFIX . $name;
     }
 
-    protected function lock(): void
+    protected function lock()
     {
-        $this->loop->execute(function (): void {
+        $this->loop->execute(function () {
             $this->acquired = microtime(true);
 
             /*
@@ -76,7 +76,7 @@ abstract class SpinlockMutex extends LockMutex
         });
     }
 
-    protected function unlock(): void
+    protected function unlock()
     {
         $elapsed_time = microtime(true) - $this->acquired;
         if ($elapsed_time > $this->timeout) {

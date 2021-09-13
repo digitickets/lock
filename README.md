@@ -6,11 +6,7 @@
 
 # php-lock/lock
 
-[![Latest Stable Version](https://poser.pugx.org/malkusch/lock/version)](https://packagist.org/packages/malkusch/lock)
-[![Total Downloads](https://poser.pugx.org/malkusch/lock/downloads)](https://packagist.org/packages/malkusch/lock)
-[![Latest Unstable Version](https://poser.pugx.org/malkusch/lock/v/unstable)](//packagist.org/packages/malkusch/lock)
-[![Build Status](https://travis-ci.org/php-lock/lock.svg?branch=master)](https://travis-ci.org/php-lock/lock)
-[![License](https://poser.pugx.org/malkusch/lock/license)](https://packagist.org/packages/malkusch/lock)
+This is a fork of [php-lock/lock](https://github.com/php-lock/lock) to add PHP 7.0 support. It removes database locking support.
 
 This library helps executing critical code in concurrent situations.
 
@@ -20,12 +16,11 @@ php-lock/lock follows semantic versioning. Read more on [semver.org][1].
 
 ## Requirements
 
- - PHP 7.1 or above
+ - PHP 7.0 or above
  - Optionally [nrk/predis][2] to use the Predis locks.
  - Optionally the [php-pcntl][3] extension to enable locking with `flock()`
    without busy waiting in CLI scripts.
- - Optionally `flock()`, `ext-redis`, `ext-pdo_mysql`, `ext-pdo_sqlite`,
-   `ext-pdo_pgsql` or `ext-memcached` can be used as a backend for locks. See
+ - Optionally `flock()`, `ext-redis` can be used as a backend for locks. See
    examples below.
  - If `ext-redis` is used for locking and is configured to use igbinary for
    serialization or lzf for compression, additionally `ext-igbinary` and/or
@@ -168,12 +163,9 @@ own implementation.
 
 - [`CASMutex`](#casmutex)
 - [`FlockMutex`](#flockmutex)
-- [`MemcachedMutex`](#memcachedmutex)
 - [`PHPRedisMutex`](#phpredismutex)
 - [`PredisMutex`](#predismutex)
 - [`SemaphoreMutex`](#semaphoremutex)
-- [`TransactionalMutex`](#transactionalmutex)
-- [`MySQLMutex`](#mysqlmutex)
 - [`PgAdvisoryLockMutex`](#pgadvisorylockmutex)
 
 #### CASMutex
@@ -220,27 +212,6 @@ $mutex->synchronized(function () use ($bankAccount, $amount) {
 
 Timeouts are supported as an optional second argument. This uses the `ext-pcntl`
 extension if possible or busy waiting if not.
-
-#### MemcachedMutex
-
-The **MemcachedMutex** is a spinlock implementation which uses the
-[`Memcached` API](http://php.net/manual/en/book.memcached.php).
-
-Example:
-```php
-$memcache = new \Memcached();
-$memcache->addServer("localhost", 11211);
-
-$mutex = new MemcachedMutex("balance", $memcache);
-$mutex->synchronized(function () use ($bankAccount, $amount) {
-    $balance = $bankAccount->getBalance();
-    $balance -= $amount;
-    if ($balance < 0) {
-        throw new \DomainException("You have no credit.");
-    }
-    $bankAccount->setBalance($balance);
-});
-```
 
 #### PHPRedisMutex
 
@@ -299,89 +270,6 @@ Example:
 ```php
 $semaphore = sem_get(ftok(__FILE__, "a"));
 $mutex = new SemaphoreMutex($semaphore);
-$mutex->synchronized(function () use ($bankAccount, $amount) {
-    $balance = $bankAccount->getBalance();
-    $balance -= $amount;
-    if ($balance < 0) {
-        throw new \DomainException("You have no credit.");
-    }
-    $bankAccount->setBalance($balance);
-});
-```
-
-#### TransactionalMutex
-
-The **TransactionalMutex**
-delegates the serialization to the DBS. The exclusive code is executed within
-a transaction. It's up to you to set the correct transaction isolation level.
-However if the transaction fails (i.e. a `PDOException` was thrown), the code
-will be executed again in a new transaction. Therefore the code must not have
-any side effects besides SQL statements. Also the isolation level should be
-conserved for the repeated transaction. If the code throws an exception,
-the transaction is rolled back and not replayed again.
-
-Example:
-```php
-$mutex = new TransactionalMutex($pdo);
-$mutex->synchronized(function () use ($pdo, $accountId, $amount) {
-    $select = $pdo->prepare(
-        "SELECT balance FROM account WHERE id = ? FOR UPDATE"
-    );
-    $select->execute([$accountId]);
-    $balance = $select->fetchColumn();
-
-    $balance -= $amount;
-    if ($balance < 0) {
-        throw new \DomainException("You have no credit.");
-    }
-    $pdo->prepare("UPDATE account SET balance = ? WHERE id = ?")
-        ->execute([$balance, $accountId]);
-});
-```
-
-#### MySQLMutex
-
-The **MySQLMutex** uses MySQL's
-[`GET_LOCK`](https://dev.mysql.com/doc/refman/8.0/en/miscellaneous-functions.html#function_get-lock)
-function.
-
-It supports time outs. If the connection to the database server is lost or
-interrupted, the lock is automatically released.
-
-Note that before MySQL 5.7.5 you cannot use nested locks, any new lock will
-silently release already held locks. You should probably refrain from using this
-mutex on MySQL versions < 5.7.5.
-
-```php
-$pdo = new PDO("mysql:host=localhost;dbname=test", "username");
-
-$mutex = new MySQLMutex($pdo, "balance", 15);
-$mutex->synchronized(function () use ($bankAccount, $amount) {
-    $balance = $bankAccount->getBalance();
-    $balance -= $amount;
-    if ($balance < 0) {
-        throw new \DomainException("You have no credit.");
-    }
-    $bankAccount->setBalance($balance);
-});
-```
-
-#### PgAdvisoryLockMutex
-
-The **PgAdvisoryLockMutex** uses PostgreSQL's
-[advisory locking](https://www.postgresql.org/docs/9.4/static/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
-functions.
-
-Named locks are offered. PostgreSQL locking functions require integers but the
-conversion is handled automatically.
-
-No time outs are supported. If the connection to the database server is lost or
-interrupted, the lock is automatically released.
-
-```php
-$pdo = new PDO("pgsql:host=localhost;dbname=test;", "username");
-
-$mutex = new PgAdvisoryLockMutex($pdo, "balance");
 $mutex->synchronized(function () use ($bankAccount, $amount) {
     $balance = $bankAccount->getBalance();
     $balance -= $amount;

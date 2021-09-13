@@ -42,7 +42,7 @@ class CASMutex extends Mutex
     /**
      * Notifies the Mutex about a successful CAS operation.
      */
-    public function notify(): void
+    public function notify()
     {
         $this->loop->end();
     }

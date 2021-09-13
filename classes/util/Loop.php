@@ -64,7 +64,7 @@ class Loop
      *
      * @return void
      */
-    public function end(): void
+    public function end()
     {
         $this->looping = false;
     }

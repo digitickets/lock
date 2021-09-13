@@ -69,7 +69,7 @@ final class PcntlTimeout
     {
         $existingHandler = pcntl_signal_get_handler(SIGALRM);
 
-        $signal = pcntl_signal(SIGALRM, function (): void {
+        $signal = pcntl_signal(SIGALRM, function () {
             throw new DeadlineException(sprintf(
                 'Timebox hit deadline of %d seconds',
                 $this->timeout

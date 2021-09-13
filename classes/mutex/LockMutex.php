@@ -25,7 +25,7 @@ abstract class LockMutex extends Mutex
      * @throws \malkusch\lock\exception\LockAcquireException The lock could not
      * be acquired.
      */
-    abstract protected function lock(): void;
+    abstract protected function lock();
 
     /**
      * Releases the lock.
@@ -33,7 +33,7 @@ abstract class LockMutex extends Mutex
      * @throws \malkusch\lock\exception\LockReleaseException The lock could not
      * be released.
      */
-    abstract protected function unlock(): void;
+    abstract protected function unlock();
 
     /**
      * {@inheritDoc}
