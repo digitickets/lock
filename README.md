@@ -5,9 +5,10 @@
 
 # php-lock/lock
 
-This is a fork of [php-lock/lock](https://github.com/php-lock/lock) to add PHP 7.0 support. It removes database locking support.
+This is a fork of [php-lock/lock](https://github.com/php-lock/lock) to add PHP 7.0 support. 
+It removes support for most locks except Redis.
 
-This library helps executing critical code in concurrent situations. It supports redis cluster.
+This library helps to execute critical code in concurrent situations (aka Mutex). It supports redis clustering.
 
 php-lock/lock follows semantic versioning. Read more on [semver.org][1].
 
@@ -17,9 +18,8 @@ php-lock/lock follows semantic versioning. Read more on [semver.org][1].
 
  - PHP 7.0 or above
  - Optionally [nrk/predis][2] to use the Predis locks.
- - Optionally the [php-pcntl][3] extension to enable locking with `flock()`
    without busy waiting in CLI scripts.
- - Optionally `flock()`, `ext-redis` can be used as a backend for locks. See
+ - Optionally `ext-redis` can be used as a backend for locks. See
    examples below.
  - If `ext-redis` is used for locking and is configured to use igbinary for
    serialization or lzf for compression, additionally `ext-igbinary` and/or
@@ -35,7 +35,7 @@ To use this library through [composer][4], run the following terminal command
 inside your repository's root folder.
 
 ```sh
-composer require "malkusch/lock"
+composer require "digitickets/lock"
 ```
 
 ## Usage
@@ -160,57 +160,8 @@ Because the [`malkusch\lock\mutex\Mutex`](#mutex) class is an abstract class,
 you can choose from one of the provided implementations or create/extend your
 own implementation.
 
-- [`CASMutex`](#casmutex)
-- [`FlockMutex`](#flockmutex)
 - [`PHPRedisMutex`](#phpredismutex)
 - [`PredisMutex`](#predismutex)
-- [`SemaphoreMutex`](#semaphoremutex)
-- [`PgAdvisoryLockMutex`](#pgadvisorylockmutex)
-
-#### CASMutex
-
-The **CASMutex** has to be used with a [Compare-and-swap][10] operation. This
-mutex is lock free. It will repeat executing the code until the CAS operation
-was successful. The code should therefore notify the mutex by calling
-[`malkusch\lock\mutex\CASMutex::notify()`][11].
-
-As the mutex keeps executing the critical code, it must not have any side
-effects as long as the CAS operation was not successful.
-
-Example:
-
-```php
-$mutex = new CASMutex();
-$mutex->synchronized(function () use ($memcached, $mutex, $amount) {
-    $balance = $memcached->get("balance", null, $casToken);
-    $balance -= $amount;
-    if (!$memcached->cas($casToken, "balance", $balance)) {
-        return;
-    }
-    $mutex->notify();
-});
-```
-
-#### FlockMutex
-
-The **FlockMutex** is a lock implementation based on
-[`flock()`](http://php.net/manual/en/function.flock.php).
-
-Example:
-```php
-$mutex = new FlockMutex(fopen(__FILE__, "r"));
-$mutex->synchronized(function () use ($bankAccount, $amount) {
-    $balance = $bankAccount->getBalance();
-    $balance -= $amount;
-    if ($balance < 0) {
-        throw new \DomainException("You have no credit.");
-    }
-    $bankAccount->setBalance($balance);
-});
-```
-
-Timeouts are supported as an optional second argument. This uses the `ext-pcntl`
-extension if possible or busy waiting if not.
 
 #### PHPRedisMutex
 
