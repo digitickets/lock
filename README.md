@@ -2,13 +2,12 @@
 **[Installation](#installation)** |
 **[Usage](#usage)** |
 **[License and authors](#license-and-authors)** |
-**[Donations](#donations)**
 
 # php-lock/lock
 
 This is a fork of [php-lock/lock](https://github.com/php-lock/lock) to add PHP 7.0 support. It removes database locking support.
 
-This library helps executing critical code in concurrent situations.
+This library helps executing critical code in concurrent situations. It supports redis cluster.
 
 php-lock/lock follows semantic versioning. Read more on [semver.org][1].
 
@@ -283,12 +282,6 @@ $mutex->synchronized(function () use ($bankAccount, $amount) {
 ## License and authors
 
 This project is free and under the WTFPL.
-Responsible for this project is Willem Stuursma-Ruwen <willem@stuursma.name>.
-
-## Donations
-
-If you like this project and feel generous donate a few Bitcoins here:
-[1P5FAZ4QhXCuwYPnLZdk3PJsqePbu1UDDA](bitcoin:1P5FAZ4QhXCuwYPnLZdk3PJsqePbu1UDDA)
 
 [1]: http://semver.org
 [2]: https://github.com/nrk/predis

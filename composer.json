@@ -1,5 +1,5 @@
 {
-    "name": "malkusch/lock",
+    "name": "digitickets/lock",
     "description": "Mutex library for exclusive code execution (fork of php-lock/lock).",
     "keywords": [
         "mutex",
