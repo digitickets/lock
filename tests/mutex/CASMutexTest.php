@@ -19,7 +19,7 @@ class CASMutexTest extends TestCase
 {
     use PHPMock;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class CASMutexTest extends TestCase
         $this->expectException(LockAcquireException::class);
 
         $mutex = new CASMutex(1);
-        $mutex->synchronized(function (): void {
+        $mutex->synchronized(function () {
             sleep(2);
         });
     }
@@ -81,7 +81,7 @@ class CASMutexTest extends TestCase
     {
         $i = 0;
         $mutex = new CASMutex();
-        $mutex->synchronized(function () use ($mutex, &$i): void {
+        $mutex->synchronized(function () use ($mutex, &$i) {
             $i++;
             if ($i > 1) {
                 $mutex->notify();

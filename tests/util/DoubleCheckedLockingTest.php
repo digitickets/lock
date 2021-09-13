@@ -21,7 +21,7 @@ class DoubleCheckedLockingTest extends TestCase
      */
     private $mutex;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ class DoubleCheckedLockingTest extends TestCase
             return false;
         });
 
-        $result = $checkedLocking->then(function (): void {
+        $result = $checkedLocking->then(function () {
             $this->fail();
         });
 
@@ -102,7 +102,7 @@ class DoubleCheckedLockingTest extends TestCase
                 });
 
         $checkedLocking = new DoubleCheckedLocking($this->mutex, $check);
-        $result = $checkedLocking->then(function (): void {
+        $result = $checkedLocking->then(function () {
             $this->fail();
         });
 

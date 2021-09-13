@@ -22,7 +22,7 @@ class SpinlockMutexTest extends TestCase
 {
     use PHPMock;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 

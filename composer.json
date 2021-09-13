@@ -65,7 +65,6 @@
             "/tests",
             "/.gitattributes",
             "/.gitignore",
-            "/.travis.yml",
             "/phpunit.xml",
             "/.github"
         ]

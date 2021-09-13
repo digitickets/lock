@@ -181,7 +181,7 @@ Example:
 
 ```php
 $mutex = new CASMutex();
-$mutex->synchronized(function () use ($memcached, $mutex, $amount): void {
+$mutex->synchronized(function () use ($memcached, $mutex, $amount) {
     $balance = $memcached->get("balance", null, $casToken);
     $balance -= $amount;
     if (!$memcached->cas($casToken, "balance", $balance)) {
@@ -250,25 +250,6 @@ Example:
 $redis = new Client("redis://localhost");
 
 $mutex = new PredisMutex([$redis], "balance");
-$mutex->synchronized(function () use ($bankAccount, $amount) {
-    $balance = $bankAccount->getBalance();
-    $balance -= $amount;
-    if ($balance < 0) {
-        throw new \DomainException("You have no credit.");
-    }
-    $bankAccount->setBalance($balance);
-});
-```
-
-#### SemaphoreMutex
-
-The **SemaphoreMutex** is a lock implementation based on
-[Semaphore](http://php.net/manual/en/ref.sem.php).
-
-Example:
-```php
-$semaphore = sem_get(ftok(__FILE__, "a"));
-$mutex = new SemaphoreMutex($semaphore);
 $mutex->synchronized(function () use ($bankAccount, $amount) {
     $balance = $bankAccount->getBalance();
     $balance -= $amount;

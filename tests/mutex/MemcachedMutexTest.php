@@ -30,7 +30,7 @@ class MemcachedMutexTest extends TestCase
      */
     private $mutex;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->memcached = $this->createMock(\Memcached::class);
         $this->mutex = new MemcachedMutex('test', $this->memcached, 1);
@@ -48,7 +48,7 @@ class MemcachedMutexTest extends TestCase
             ->with('lock_test', true, 2)
             ->willReturn(false);
 
-        $this->mutex->synchronized(function (): void {
+        $this->mutex->synchronized(function () {
             $this->fail('execution is not expected');
         });
     }
@@ -70,7 +70,7 @@ class MemcachedMutexTest extends TestCase
             ->with('lock_test')
             ->willReturn(false);
 
-        $this->mutex->synchronized(function (): void {
+        $this->mutex->synchronized(function () {
         });
     }
 }
